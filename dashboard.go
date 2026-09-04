@@ -94,9 +94,11 @@ func (s *server) handleVideos(w http.ResponseWriter, r *http.Request, u *user) {
 	writeJSON(w, http.StatusOK, out)
 }
 
-// POST /api/videos/{id}  {retention}  — change how long this video lives.
+// POST /api/videos/{id}  {name?, retention?}  — rename the video and/or change
+// how long it lives. Either field may be present; at least one must be.
 func (s *server) handleUpdateVideo(w http.ResponseWriter, r *http.Request, u *user) {
 	var body struct {
+		Name      string `json:"name"`
 		Retention string `json:"retention"`
 	}
 	if err := readJSON(r, &body); err != nil {
@@ -113,22 +115,54 @@ func (s *server) handleUpdateVideo(w http.ResponseWriter, r *http.Request, u *us
 		writeErr(w, http.StatusNotFound, "no such video")
 		return
 	}
-	retention := clampRetention(body.Retention, s.cfg.MaxRetention)
-	exp := expiryFrom(retention, time.Now())
-	ok, err := s.store.setVideoExpiry(id, u.ID, exp)
-	if err != nil {
-		s.fail(w, "set expiry", err)
+
+	resp := map[string]any{}
+
+	if name := cleanName(body.Name); name != "" {
+		if _, err := s.store.setVideoName(id, u.ID, name); err != nil {
+			s.fail(w, "rename video", err)
+			return
+		}
+		resp["name"] = name
+	}
+
+	if body.Retention != "" {
+		retention := clampRetention(body.Retention, s.cfg.MaxRetention)
+		exp := expiryFrom(retention, time.Now())
+		if _, err := s.store.setVideoExpiry(id, u.ID, exp); err != nil {
+			s.fail(w, "set expiry", err)
+			return
+		}
+		resp["retention"] = retention
+		var expUnix int64
+		if exp.Valid {
+			expUnix = exp.Int64
+		}
+		resp["expires_at"] = expUnix
+	}
+
+	if len(resp) == 0 {
+		writeErr(w, http.StatusBadRequest, "nothing to update")
 		return
 	}
-	if !ok {
-		writeErr(w, http.StatusNotFound, "no such video")
-		return
+	writeJSON(w, http.StatusOK, resp)
+}
+
+// cleanName normalises a user-supplied display name: control characters
+// (newlines, tabs) collapse to spaces, and it's trimmed and length-capped. An
+// empty result means "no change".
+func cleanName(s string) string {
+	s = strings.Map(func(r rune) rune {
+		if r < 0x20 || r == 0x7f {
+			return ' '
+		}
+		return r
+	}, s)
+	s = strings.TrimSpace(s)
+	if len(s) > 300 {
+		s = strings.TrimSpace(s[:300])
 	}
-	var expUnix int64
-	if exp.Valid {
-		expUnix = exp.Int64
-	}
-	writeJSON(w, http.StatusOK, map[string]any{"retention": retention, "expires_at": expUnix})
+	return s
 }
 
 // DELETE /api/videos/{id}

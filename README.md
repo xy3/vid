@@ -26,6 +26,10 @@ the only secret.
 - **Retention.** Per upload: 1 hour, 1 day, 7 days, 30 days, or forever (capped
   by `max_retention`). Changeable afterwards from the dashboard. A janitor
   sweeps expired videos — row and files — every 5 minutes.
+- **Rename.** Double-click a video's name on the dashboard (or the Rename
+  button). The new name shows on the dashboard, becomes the share page's
+  `og:title`, and is the filename a Download gives you. `POST /api/videos/<id>`
+  takes `name`, `retention`, or both.
 
 ## Running it
 

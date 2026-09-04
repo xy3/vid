@@ -228,6 +228,17 @@ func (s *store) setVideoReady(id string, outputBytes int64) error {
 	return err
 }
 
+// setVideoName changes the display name (used on the dashboard, the share
+// page's og:title, and the download filename). Owner-scoped.
+func (s *store) setVideoName(id string, ownerID int64, name string) (bool, error) {
+	res, err := s.db.Exec(`UPDATE videos SET orig_name = ? WHERE id = ? AND owner_id = ?`, name, id, ownerID)
+	if err != nil {
+		return false, err
+	}
+	n, _ := res.RowsAffected()
+	return n > 0, nil
+}
+
 // setVideoExpiry is owner-scoped so a guessed id can't retention-bomb someone
 // else's video. Returns whether a row matched.
 func (s *store) setVideoExpiry(id string, ownerID int64, expiresAt sql.NullInt64) (bool, error) {

@@ -251,7 +251,9 @@ function renderVideo(v) {
   const el = cloneTpl("tpl-video");
   el.dataset.id = v.id;
 
-  $(".v-name", el).textContent = v.name;
+  const nameEl = $(".v-name", el);
+  nameEl.textContent = v.name;
+  nameEl.title = "Double-click to rename";
 
   const pill = $(".pill", el);
   pill.textContent = v.status;
@@ -295,6 +297,9 @@ function renderVideo(v) {
     (navigator.clipboard?.writeText(v.url) || Promise.reject()).then(done, () => window.prompt("Copy this link:", v.url));
   });
 
+  $(".v-rename", el).addEventListener("click", () => startRename(v, nameEl));
+  nameEl.addEventListener("dblclick", () => startRename(v, nameEl));
+
   const retWrap = $(".v-retwrap", el);
   const retSel = $(".v-ret", el);
   if (v.status === "failed") {
@@ -328,4 +333,43 @@ function renderVideo(v) {
   });
 
   return el;
+}
+
+// startRename swaps the name label for an input. Enter or blur saves, Escape
+// cancels. Polling only runs while something is uploading or transcoding, so on
+// an idle library the row won't be re-rendered out from under the edit.
+function startRename(v, nameEl) {
+  if (nameEl.querySelector("input")) return;
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "v-name-edit";
+  input.value = v.name;
+  input.maxLength = 300;
+  input.setAttribute("aria-label", "Video name");
+  nameEl.replaceChildren(input);
+  input.focus();
+  input.select();
+
+  let settled = false;
+  const revert = () => { if (!settled) { settled = true; nameEl.textContent = v.name; } };
+  const save = async () => {
+    if (settled) return;
+    const next = input.value.trim();
+    if (!next || next === v.name) { revert(); return; }
+    settled = true;
+    nameEl.textContent = next;
+    try {
+      await api("/api/videos/" + v.id, jsonInit("POST", { name: next }));
+      v.name = next;
+      loadVideos();
+    } catch (e) {
+      nameEl.textContent = v.name;
+    }
+  };
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); save(); }
+    else if (e.key === "Escape") { e.preventDefault(); revert(); }
+  });
+  input.addEventListener("blur", save);
 }

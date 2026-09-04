@@ -130,6 +130,8 @@ select{
 .v-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .v-line{display:flex;align-items:center;gap:10px}
 .v-name{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.v-name-edit{width:100%;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--text);
+  background:var(--ink);border:1px solid var(--accent);border-radius:6px;padding:3px 7px;outline:none}
 .pill{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
   padding:3px 7px;border-radius:6px;border:1px solid var(--line-hi);color:var(--dim);flex:none}
 .pill.ready{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
