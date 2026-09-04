@@ -1,0 +1,109 @@
+{{define "video.tmpl" -}}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{if .Name}}{{.Name}} · vid{{else}}vid{{end}}</title>
+{{if eq .State "processing"}}<meta http-equiv="refresh" content="5">{{end}}
+<link rel="icon" href="/favicon.svg">
+<style>
+  @font-face { font-family:'Plex Mono'; src:url('/static/fonts/plex-mono-600.woff2') format('woff2'); font-weight:600; font-display:swap }
+  @font-face { font-family:'Plex Sans'; src:url('/static/fonts/plex-sans-400.woff2') format('woff2'); font-weight:400; font-display:swap }
+  @font-face { font-family:'Plex Sans'; src:url('/static/fonts/plex-sans-500.woff2') format('woff2'); font-weight:500; font-display:swap }
+  :root{
+    --accent:{{.Accent}};
+    --ink:#08090c; --surface:#101319; --line:#1e222c; --text:#e9eaee; --dim:#8b93a1;
+    --mono:'Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:'Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100dvh;background:var(--ink);color:var(--text);
+    font-family:var(--sans);font-size:15px;line-height:1.55;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:24px;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{width:100%;max-width:860px}
+  .brand{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.02em;
+    color:var(--dim);margin-bottom:14px}
+  .brand b{color:var(--text)}
+  .brand .dot{color:var(--accent)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  video{display:block;width:100%;max-height:70vh;background:#000}
+  .meta{padding:16px 18px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}
+  .name{font-weight:500;font-size:16px;margin-right:auto;word-break:break-word}
+  .stat{font-family:var(--mono);font-size:12px;color:var(--dim)}
+  .stat b{color:var(--text);font-weight:600}
+  .saved{color:var(--accent)}
+  .bar{padding:16px 18px}
+  .btns{display:flex;gap:10px;padding:0 18px 18px;flex-wrap:wrap}
+  button,.btn{font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;
+    padding:9px 16px;border-radius:9px;border:1px solid var(--line);
+    background:#161b24;color:var(--text)}
+  .btn.primary{background:var(--accent);color:#04121c;border-color:transparent}
+  button:hover,.btn:hover{border-color:var(--accent);text-decoration:none}
+  .pad{padding:40px 22px;text-align:center}
+  .pad h1{font-family:var(--mono);font-weight:600;font-size:19px;margin:0 0 8px}
+  .pad p{color:var(--dim);margin:4px 0}
+  .track{height:8px;border-radius:6px;background:#1b212c;overflow:hidden;margin:18px auto 6px;max-width:340px}
+  .fill{height:100%;background:var(--accent);width:{{.Progress}}%;transition:width .4s}
+  .foot{margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--dim);text-align:center}
+  .copied{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><b>vid</b><span class="dot">.</span>1t.ie</div>
+
+  {{if eq .State "ready"}}
+  <div class="card">
+    <video controls preload="metadata" playsinline{{if .PosterOK}} poster="/t/{{.ID}}.jpg"{{end}} src="{{.FileURL}}"></video>
+    <div class="meta">
+      <span class="name">{{.Name}}</span>
+      {{if .Duration}}<span class="stat"><b>{{.Duration}}</b></span>{{end}}
+      <span class="stat"><b>{{.OutputHuman}}</b>{{if .SavedPct}} <span class="saved">− {{.SavedPct}}% vs {{.SourceHuman}}</span>{{end}}</span>
+    </div>
+    <div class="btns">
+      <a class="btn primary" href="{{.DownloadURL}}">Download</a>
+      <button type="button" id="copy" data-url="{{.ShareURL}}">Copy link</button>
+    </div>
+  </div>
+  <div class="foot">{{.ExpiresText}}</div>
+  <script src="/static/share.js"></script>
+
+  {{else if eq .State "processing"}}
+  <div class="card"><div class="pad">
+    <h1>Compressing…</h1>
+    <p>{{.Name}}</p>
+    <div class="track"><div class="fill"></div></div>
+    <p class="stat">{{.Progress}}%</p>
+    <p>This page refreshes itself. The link already works — share it now if you like.</p>
+  </div></div>
+
+  {{else if eq .State "failed"}}
+  <div class="card"><div class="pad">
+    <h1>Couldn't process this one</h1>
+    <p>{{.Name}}</p>
+    <p>The file didn't survive compression. Try uploading it again.</p>
+  </div></div>
+
+  {{else if eq .State "notice"}}
+  <div class="card"><div class="pad">
+    <h1>{{.Name}}</h1>
+    <p>{{.ExpiresText}}</p>
+    <p><a href="/">Home</a></p>
+  </div></div>
+
+  {{else}}
+  <div class="card"><div class="pad">
+    <h1>Not here</h1>
+    <p>This video doesn't exist, or it has already been deleted.</p>
+    <p><a href="/">Home</a></p>
+  </div></div>
+  {{end}}
+</div>
+</body>
+</html>
+{{- end}}

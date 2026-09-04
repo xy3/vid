@@ -1,0 +1,10 @@
+{
+  "google_client_id": "xxxxxxxx.apps.googleusercontent.com",
+  "google_client_secret": "GOCSPX-xxxxxxxx",
+  "base_url": "https://vid.1t.ie",
+  "allowed_emails": ["you@gmail.com"],
+  "max_upload_bytes": 2147483648,
+  "user_quota_bytes": 21474836480,
+  "max_retention": "forever",
+  "transcode_timeout_secs": 7200
+}

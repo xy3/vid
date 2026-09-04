@@ -1,0 +1,154 @@
+/* vid.1t.ie — drag-and-drop video sharing.
+   1t.ie family: #08090c ground, Plex Mono for display, Plex Sans for body,
+   hairline borders, one accent (#4db8ff), restrained motion. */
+
+@font-face { font-family:'Plex Mono'; src:url('/static/fonts/plex-mono-500.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
+@font-face { font-family:'Plex Mono'; src:url('/static/fonts/plex-mono-600.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
+@font-face { font-family:'Plex Sans'; src:url('/static/fonts/plex-sans-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
+@font-face { font-family:'Plex Sans'; src:url('/static/fonts/plex-sans-500.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
+
+:root{
+  --accent:#4db8ff;
+  --accent-ink:#04121c;
+  --ink:#08090c;
+  --surface:#101319;
+  --surface-hi:#161b24;
+  --line:#1e222c;
+  --line-hi:#2b303c;
+  --text:#e9eaee;
+  --dim:#8b93a1;
+  --dim-2:#5b6270;
+  --danger:#e0748a;
+  --ok:#5ec98f;
+  --mono:'Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:'Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+  font-synthesis:none;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100dvh;background:var(--ink);color:var(--text);
+  font-family:var(--sans);font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+.mono{font-family:var(--mono)}
+
+/* ---------- header ---------- */
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:18px 22px;border-bottom:1px solid var(--line);
+}
+.wordmark{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.02em}
+.wordmark b{color:var(--text)}
+.wordmark span{color:var(--dim)}
+.who{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--dim)}
+.avatar{border-radius:50%;background:var(--surface-hi);object-fit:cover}
+.email{font-family:var(--mono);font-size:12px}
+.ghost{border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--dim);transition:border-color .15s}
+.ghost:hover{border-color:var(--accent);color:var(--text)}
+
+.main{max-width:920px;margin:0 auto;padding:34px 22px 80px}
+.loading{color:var(--dim);font-family:var(--mono);font-size:13px;padding:40px 0;text-align:center}
+
+/* ---------- landing ---------- */
+.hero{max-width:640px;margin:6vh auto 0;text-align:center}
+.hero h1{font-family:var(--mono);font-weight:600;font-size:clamp(30px,7vw,46px);line-height:1.08;margin:0 0 18px;letter-spacing:-.01em}
+.lead{color:var(--dim);font-size:16px;margin:0 auto 26px;max-width:38ch}
+.points{list-style:none;padding:0;margin:0 auto 30px;display:inline-flex;flex-direction:column;gap:8px;text-align:left}
+.points li{position:relative;padding-left:22px;color:var(--text);font-size:14px}
+.points li::before{content:"";position:absolute;left:4px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.points .mono{color:var(--dim);font-size:12px}
+.fineprint{margin-top:18px;color:var(--dim-2);font-size:12px;font-family:var(--mono)}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-block;border:1px solid var(--line-hi);border-radius:10px;
+  padding:10px 18px;font-size:14px;font-weight:500;color:var(--text);
+  background:var(--surface-hi);cursor:pointer;transition:border-color .15s,transform .15s;
+}
+.btn:hover{border-color:var(--accent)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.big{padding:13px 26px;font-size:15px}
+.link{background:none;border:0;color:var(--accent);cursor:pointer;font-size:inherit;padding:0;text-decoration:underline}
+
+/* ---------- dropzone ---------- */
+.app{display:flex;flex-direction:column;gap:26px}
+.dropzone{
+  border:1.5px dashed var(--line-hi);border-radius:16px;background:var(--surface);
+  padding:30px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;
+  transition:border-color .15s,background .15s;
+}
+.dropzone.hot{border-color:var(--accent);background:var(--surface-hi)}
+.dz-main{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dz-main strong{font-family:var(--mono);font-weight:600;font-size:16px}
+.dz-main span{color:var(--dim);font-size:13px}
+.dz-ret{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px}
+select{
+  font-family:var(--mono);font-size:12px;color:var(--text);background:var(--surface-hi);
+  border:1px solid var(--line-hi);border-radius:8px;padding:6px 8px;cursor:pointer;
+}
+
+/* full-window drag veil */
+.dropveil{
+  position:fixed;inset:0;z-index:50;display:none;place-items:center;
+  background:rgba(6,10,16,.86);backdrop-filter:blur(3px);
+  border:2px dashed var(--accent);
+}
+.dropveil.show{display:grid}
+.dropveil div{font-family:var(--mono);font-weight:600;font-size:20px;color:var(--accent)}
+
+/* ---------- upload queue ---------- */
+.queue{display:flex;flex-direction:column;gap:10px}
+.q{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px}
+.q-top{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+.q-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q-stat{font-family:var(--mono);font-size:12px;color:var(--dim);flex:none}
+.q-stat.err{color:var(--danger)}
+.track{height:6px;border-radius:5px;background:#1b212c;overflow:hidden;margin-top:9px}
+.track > i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s var(--ease)}
+.track.done > i{background:var(--ok)}
+
+/* ---------- library ---------- */
+.lib-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.lib-head h2{font-family:var(--mono);font-weight:600;font-size:15px;margin:0}
+.count{color:var(--dim-2);font-family:var(--mono);font-size:12px}
+.empty{color:var(--dim);font-size:14px;padding:20px 0}
+.videos{display:flex;flex-direction:column;gap:12px}
+
+.v{display:flex;gap:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px;transition:border-color .15s}
+.v:hover{border-color:var(--line-hi)}
+.v-thumb{flex:none;width:132px;aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:#0b0e13;border:1px solid var(--line)}
+.v-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.v-thumb img:not([src]),.v-thumb img[src=""]{opacity:0}
+.v-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.v-line{display:flex;align-items:center;gap:10px}
+.v-name{font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.pill{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
+  padding:3px 7px;border-radius:6px;border:1px solid var(--line-hi);color:var(--dim);flex:none}
+.pill.ready{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.pill.processing,.pill.queued{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.pill.failed{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 40%,transparent)}
+.v-progress{height:5px;border-radius:4px;background:#1b212c;overflow:hidden}
+.v-fill{height:100%;width:0;background:var(--accent);transition:width .4s var(--ease)}
+.v-meta{font-family:var(--mono);font-size:11.5px;color:var(--dim)}
+.v-meta .saved{color:var(--accent)}
+.v-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:auto}
+.mini{font-size:12px;color:var(--dim);background:var(--surface-hi);border:1px solid var(--line);
+  border-radius:7px;padding:5px 9px;cursor:pointer;transition:border-color .15s,color .15s}
+.mini:hover{border-color:var(--accent);color:var(--text)}
+.mini.danger:hover{border-color:var(--danger);color:var(--danger)}
+.mini.copied{color:var(--ok);border-color:var(--ok)}
+.v-retwrap{display:flex;align-items:center;gap:6px}
+.v-retwrap select{padding:4px 6px;font-size:11px}
+
+@media (max-width:560px){
+  .v{flex-direction:column}
+  .v-thumb{width:100%}
+}

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vid · drop a video, get a link</title>
+<meta name="description" content="Sign in, drag a video onto the page. It's compressed, hosted, and handed back as a shareable link that deletes itself on your schedule.">
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="dropveil" id="dropveil"><div>Drop to upload</div></div>
+
+<header class="top">
+  <a class="wordmark" href="/"><b>vid</b><span>.1t.ie</span></a>
+  <div class="who" id="who" hidden>
+    <img class="avatar" id="avatar" alt="" width="24" height="24">
+    <span class="email" id="email"></span>
+    <a class="ghost" href="/auth/logout">Sign out</a>
+  </div>
+</header>
+
+<main id="main" class="main">
+  <div class="loading">Loading…</div>
+</main>
+
+<template id="tpl-landing">
+  <section class="hero">
+    <h1>Drop a video.<br>Get a link.</h1>
+    <p class="lead">Sign in, then drag a file anywhere on the page. It's compressed,
+      hosted, and handed back as a link you can share — set to delete itself after
+      an hour, a week, or never.</p>
+    <ul class="points">
+      <li>Drag &amp; drop, no forms</li>
+      <li>Compressed with ffmpeg, <span class="mono">h264</span> + faststart</li>
+      <li>Self-destructs on your schedule</li>
+    </ul>
+    <a class="btn primary big" href="/auth/google/start">Continue with Google</a>
+    <p class="fineprint">Private instance — access is limited to an allowlist.</p>
+  </section>
+</template>
+
+<template id="tpl-app">
+  <section class="app">
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="filepick" accept="video/*" multiple hidden>
+      <div class="dz-main">
+        <strong>Drop videos here</strong>
+        <span>or <button type="button" class="link" id="browse">browse</button></span>
+      </div>
+      <label class="dz-ret">
+        Delete after
+        <select id="retention"></select>
+      </label>
+    </div>
+
+    <div class="queue" id="queue" hidden></div>
+
+    <div class="library">
+      <div class="lib-head">
+        <h2>Your videos</h2>
+        <span class="count" id="count"></span>
+      </div>
+      <div id="videos" class="videos"></div>
+      <p class="empty" id="empty" hidden>Nothing yet. Drop a video above.</p>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-video">
+  <article class="v" data-id="">
+    <div class="v-thumb"><a class="v-open" target="_blank" rel="noopener"><img alt="" loading="lazy"></a></div>
+    <div class="v-body">
+      <div class="v-line">
+        <span class="v-name"></span>
+        <span class="pill"></span>
+      </div>
+      <div class="v-progress" hidden><div class="v-fill"></div></div>
+      <div class="v-meta"></div>
+      <div class="v-actions">
+        <button type="button" class="mini v-copy">Copy link</button>
+        <a class="mini v-open2" target="_blank" rel="noopener">Open</a>
+        <label class="mini v-retwrap">Expiry <select class="v-ret"></select></label>
+        <button type="button" class="mini danger v-del">Delete</button>
+      </div>
+    </div>
+  </article>
+</template>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
