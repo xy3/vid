@@ -6,6 +6,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{if .Name}}{{.Name}} · vid{{else}}vid{{end}}</title>
 {{if eq .State "processing"}}<meta http-equiv="refresh" content="5">{{end}}
+{{if eq .State "ready"}}
+<meta name="theme-color" content="{{.Accent}}">
+<meta property="og:site_name" content="vid.1t.ie">
+<meta property="og:type" content="video.other">
+<meta property="og:title" content="{{.Name}}">
+<meta property="og:description" content="{{.OGDescription}}">
+<meta property="og:url" content="{{.ShareURL}}">
+{{if .PosterOK}}<meta property="og:image" content="{{.AbsPosterURL}}">
+<meta property="og:image:width" content="640">{{end}}
+<meta property="og:video" content="{{.AbsFileURL}}">
+<meta property="og:video:url" content="{{.AbsFileURL}}">
+<meta property="og:video:secure_url" content="{{.AbsFileURL}}">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="{{.Width}}">
+<meta property="og:video:height" content="{{.Height}}">
+<meta name="twitter:card" content="player">
+<meta name="twitter:title" content="{{.Name}}">
+{{if .PosterOK}}<meta name="twitter:image" content="{{.AbsPosterURL}}">{{end}}
+<meta name="twitter:player:stream" content="{{.AbsFileURL}}">
+<meta name="twitter:player:stream:content_type" content="video/mp4">
+<meta name="twitter:player:width" content="{{.Width}}">
+<meta name="twitter:player:height" content="{{.Height}}">
+{{end}}
 <link rel="icon" href="/favicon.svg">
 <style>
   @font-face { font-family:'Plex Mono'; src:url('/static/fonts/plex-mono-600.woff2') format('woff2'); font-weight:600; font-display:swap }

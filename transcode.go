@@ -167,6 +167,13 @@ func (t *transcoder) process(parentCtx context.Context, id string) {
 		return
 	}
 
+	// Re-probe the output: the source dimensions were scaled down, and link
+	// unfurlers (Discord, Slack, iMessage) need the real width/height of the
+	// file they'll embed.
+	if _, ow, oh, perr := ffprobe(ctx, out); perr == nil && ow > 0 && oh > 0 {
+		_ = t.store.setVideoProbe(id, dur, ow, oh)
+	}
+
 	// Best effort — a missing poster just means the share page shows the first
 	// frame the browser decodes.
 	if err := poster(ctx, out, filepath.Join(dir, "poster.jpg"), dur); err != nil {

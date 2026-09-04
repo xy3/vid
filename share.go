@@ -26,6 +26,15 @@ type videoPage struct {
 	FileURL     string
 	DownloadURL string
 	ShareURL    string
+
+	// Absolute URLs + dimensions for the Open Graph / Twitter tags that make
+	// Discord, Slack, iMessage &c. embed the player instead of showing a bare
+	// link. Only set for the "ready" state.
+	AbsFileURL   string
+	AbsPosterURL string
+	OGDescription string
+	Width        int
+	Height       int
 }
 
 // GET /v/{id} — the public share page. One template, four states.
@@ -66,6 +75,16 @@ func (s *server) handleVideoPage(w http.ResponseWriter, r *http.Request) {
 		p.FileURL = "/f/" + id + ".mp4"
 		p.DownloadURL = "/f/" + id + ".mp4?dl=1"
 		p.ShareURL = s.cfg.BaseURL + "/v/" + id
+		p.AbsFileURL = s.cfg.BaseURL + "/f/" + id + ".mp4"
+		p.AbsPosterURL = s.cfg.BaseURL + "/t/" + id + ".jpg"
+		p.Width, p.Height = v.Width, v.Height
+		// Link unfurlers won't build a video embed without dimensions; fall
+		// back to the transcode ceiling for rows probed before dimensions were
+		// stored, or when ffprobe couldn't read them.
+		if p.Width <= 0 || p.Height <= 0 {
+			p.Width, p.Height = 1280, 720
+		}
+		p.OGDescription = strings.TrimSpace(p.Duration + " · " + p.OutputHuman + " · via vid.1t.ie")
 		if _, err := os.Stat(filepath.Join(s.dataDir, "videos", id, "poster.jpg")); err == nil {
 			p.PosterOK = true
 		}
